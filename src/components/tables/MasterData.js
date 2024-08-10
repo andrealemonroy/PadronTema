@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import { useTable, useFilters } from 'react-table';
+import DynamicForm from '../Form/Form';
 
 const initialData = [
-  { id: 1, surname1: 'González', surname2: 'Pérez', name1: 'Juan', name2: '', name3: '', dniNumber: '12345678', dniType: 'DNI', birthDate: '01/01/1990', correlative: 1, fullName: 'González Pérez Juan' },
-  { id: 2, surname1: 'Rodríguez', surname2: 'Sánchez', name1: 'Ana', name2: '', name3: '', dniNumber: '87654321', dniType: 'DNI', birthDate: '02/02/1992', correlative: 2, fullName: 'Rodríguez Sánchez Ana' },
+  { id: 1, surname1: 'González', surname2: 'Pérez', name1: 'Juan', name2: '', name3: '', dniNumber: '12345678', dniType: 'DNI', birthDate: '1990-01-01', correlative: 1, fullName: 'González Pérez Juan' },
+  { id: 2, surname1: 'Rodríguez', surname2: 'Sánchez', name1: 'Ana', name2: '', name3: '', dniNumber: '87654321', dniType: 'DNI', birthDate: '1992-02-02', correlative: 2, fullName: 'Rodríguez Sánchez Ana' },
 ];
 
 const MasterDataBase = () => {
@@ -13,49 +15,77 @@ const MasterDataBase = () => {
   const [filterDniType, setFilterDniType] = useState('');
   const [filterDni, setFilterDni] = useState('');
 
+  const columns = useMemo(
+    () => [
+      { Header: 'ID', accessor: 'id' },
+      { Header: 'Apellido Paterno', accessor: 'surname1' },
+      { Header: 'Apellido Materno', accessor: 'surname2' },
+      { Header: 'Primer Nombre', accessor: 'name1' },
+      { Header: 'Segundo Nombre', accessor: 'name2' },
+      { Header: 'Tercer Nombre', accessor: 'name3' },
+      { Header: 'Número de DNI', accessor: 'dniNumber' },
+      { Header: 'Tipo de DNI', accessor: 'dniType' },
+      { Header: 'Fecha de Nacimiento', accessor: 'birthDate' },
+      { Header: 'Correlativo', accessor: 'correlative' },
+      { Header: 'Apellidos y Nombres', accessor: 'fullName' },
+      {
+        Header: 'Acciones',
+        Cell: ({ row }) => (
+          <div>
+            <button
+              onClick={() => handleEdit(row.original)}
+              className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 rounded mr-2"
+            >
+              Editar
+            </button>
+            <button
+              onClick={() => handleDelete(row.original.id)}
+              className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
+            >
+              Eliminar
+            </button>
+          </div>
+        ),
+      },
+    ],
+    []
+  );
+
+  const tableInstance = useTable({ columns, data }, useFilters);
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow, setFilter } = tableInstance;
+
   const handleEdit = (record) => {
     setSelectedRecord(record);
     setIsModalOpen(true);
   };
 
   const handleDelete = (id) => {
-    setData(data.filter(record => record.id !== id));
+    setData(data.filter((record) => record.id !== id));
   };
 
-  const handleSave = (e) => {
-    e.preventDefault();
-    if (selectedRecord.id) {
-      setData(data.map(record => (record.id === selectedRecord.id ? selectedRecord : record)));
+  const handleFormSubmit = (form) => {
+    if (form.id) {
+      setData(data.map((record) => (record.id === form.id ? form : record)));
     } else {
-      selectedRecord.id = data.length + 1;
-      setData([...data, selectedRecord]);
+      setData([...data, { ...form, id: data.length + 1 }]);
     }
     setIsModalOpen(false);
-    setSelectedRecord(null);
-  };
-
-  const handleCancel = () => {
-    setIsModalOpen(false);
-    setSelectedRecord(null);
   };
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
+    setFilter('fullName', e.target.value);
   };
 
   const handleFilterDniTypeChange = (e) => {
     setFilterDniType(e.target.value);
+    setFilter('dniType', e.target.value);
   };
 
   const handleFilterDniChange = (e) => {
     setFilterDni(e.target.value);
+    setFilter('dniNumber', e.target.value);
   };
-
-  const filteredData = data.filter(record =>
-    record.fullName.toLowerCase().includes(search.toLowerCase()) &&
-    (filterDniType ? record.dniType === filterDniType : true) &&
-    (filterDni ? record.dniNumber.includes(filterDni) : true)
-  );
 
   return (
     <div>
@@ -90,162 +120,41 @@ const MasterDataBase = () => {
           {/* Agregar más opciones si es necesario */}
         </select>
       </div>
-      <table className="min-w-full bg-white">
-        <thead>
-          <tr>
-            <th className="py-2 px-4 border-b border-gray-200">ID</th>
-            <th className="py-2 px-4 border-b border-gray-200">Apellido Paterno</th>
-            <th className="py-2 px-4 border-b border-gray-200">Apellido Materno</th>
-            <th className="py-2 px-4 border-b border-gray-200">Primer Nombre</th>
-            <th className="py-2 px-4 border-b border-gray-200">Segundo Nombre</th>
-            <th className="py-2 px-4 border-b border-gray-200">Tercer Nombre</th>
-            <th className="py-2 px-4 border-b border-gray-200">Número de DNI</th>
-            <th className="py-2 px-4 border-b border-gray-200">Tipo de DNI</th>
-            <th className="py-2 px-4 border-b border-gray-200">Fecha de Nacimiento</th>
-            <th className="py-2 px-4 border-b border-gray-200">Correlativo</th>
-            <th className="py-2 px-4 border-b border-gray-200">Apellidos y Nombres</th>
-            <th className="py-2 px-4 border-b border-gray-200">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredData.map((record) => (
-            <tr key={record.id}>
-              <td className="py-2 px-4 border-b border-gray-200">{record.id}</td>
-              <td className="py-2 px-4 border-b border-gray-200">{record.surname1}</td>
-              <td className="py-2 px-4 border-b border-gray-200">{record.surname2}</td>
-              <td className="py-2 px-4 border-b border-gray-200">{record.name1}</td>
-              <td className="py-2 px-4 border-b border-gray-200">{record.name2}</td>
-              <td className="py-2 px-4 border-b border-gray-200">{record.name3}</td>
-              <td className="py-2 px-4 border-b border-gray-200">{record.dniNumber}</td>
-              <td className="py-2 px-4 border-b border-gray-200">{record.dniType}</td>
-              <td className="py-2 px-4 border-b border-gray-200">{record.birthDate}</td>
-              <td className="py-2 px-4 border-b border-gray-200">{record.correlative}</td>
-              <td className="py-2 px-4 border-b border-gray-200">{record.fullName}</td>
-              <td className="py-2 px-4 border-b border-gray-200">
-                <button
-                  onClick={() => handleEdit(record)}
-                  className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 rounded mr-2"
-                >
-                  Editar
-                </button>
-                <button
-                  onClick={() => handleDelete(record.id)}
-                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
-                >
-                  Eliminar
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
+      <div className="overflow-x-auto">
+        <table {...getTableProps()} className="min-w-full bg-white">
+          <thead>
+            {headerGroups.map((headerGroup) => (
+              <tr {...headerGroup.getHeaderGroupProps()}>
+                {headerGroup.headers.map((column) => (
+                  <th {...column.getHeaderProps()} className="py-2 px-4 border-b border-gray-200">
+                    {column.render('Header')}
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          <tbody {...getTableBodyProps()}>
+            {rows.map((row) => {
+              prepareRow(row);
+              return (
+                <tr {...row.getRowProps()}>
+                  {row.cells.map((cell) => (
+                    <td {...cell.getCellProps()} className="py-2 px-4 border-b border-gray-200">
+                      {cell.render('Cell')}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
       {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
-            <h2 className="text-xl font-bold mb-4">{selectedRecord.id ? 'Editar Registro' : 'Añadir Registro'}</h2>
-            <form onSubmit={handleSave}>
-              <div className="mb-4">
-                <label className="block text-gray-700 mb-2">Apellido Paterno</label>
-                <input
-                  type="text"
-                  className="border border-gray-300 rounded p-2 w-full"
-                  value={selectedRecord ? selectedRecord.surname1 : ''}
-                  onChange={(e) => setSelectedRecord({ ...selectedRecord, surname1: e.target.value })}
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700 mb-2">Apellido Materno</label>
-                <input
-                  type="text"
-                  className="border border-gray-300 rounded p-2 w-full"
-                  value={selectedRecord ? selectedRecord.surname2 : ''}
-                  onChange={(e) => setSelectedRecord({ ...selectedRecord, surname2: e.target.value })}
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700 mb-2">Primer Nombre</label>
-                <input
-                  type="text"
-                  className="border border-gray-300 rounded p-2 w-full"
-                  value={selectedRecord ? selectedRecord.name1 : ''}
-                  onChange={(e) => setSelectedRecord({ ...selectedRecord, name1: e.target.value })}
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700 mb-2">Segundo Nombre</label>
-                <input
-                  type="text"
-                  className="border border-gray-300 rounded p-2 w-full"
-                  value={selectedRecord ? selectedRecord.name2 : ''}
-                  onChange={(e) => setSelectedRecord({ ...selectedRecord, name2: e.target.value })}
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700 mb-2">Tercer Nombre</label>
-                <input
-                  type="text"
-                  className="border border-gray-300 rounded p-2 w-full"
-                  value={selectedRecord ? selectedRecord.name3 : ''}
-                  onChange={(e) => setSelectedRecord({ ...selectedRecord, name3: e.target.value })}
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700 mb-2">Número de DNI</label>
-                <input
-                  type="text"
-                  className="border border-gray-300 rounded p-2 w-full"
-                  value={selectedRecord ? selectedRecord.dniNumber : ''}
-                  onChange={(e) => setSelectedRecord({ ...selectedRecord, dniNumber: e.target.value })}
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700 mb-2">Tipo de DNI</label>
-                <input
-                  type="text"
-                  className="border border-gray-300 rounded p-2 w-full"
-                  value={selectedRecord ? selectedRecord.dniType : ''}
-                  onChange={(e) => setSelectedRecord({ ...selectedRecord, dniType: e.target.value })}
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700 mb-2">Fecha de Nacimiento</label>
-                <input
-                  type="date"
-                  className="border border-gray-300 rounded p-2 w-full"
-                  value={selectedRecord ? selectedRecord.birthDate : ''}
-                  onChange={(e) => setSelectedRecord({ ...selectedRecord, birthDate: e.target.value })}
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700 mb-2">Correlativo</label>
-                <input
-                  type="number"
-                  className="border border-gray-300 rounded p-2 w-full"
-                  value={selectedRecord ? selectedRecord.correlative : ''}
-                  onChange={(e) => setSelectedRecord({ ...selectedRecord, correlative: e.target.value })}
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700 mb-2">Apellidos y Nombre</label>
-                <input
-                  type="text"
-                  className="border border-gray-300 rounded p-2 w-full"
-                  value={selectedRecord ? selectedRecord.fullName : ''}
-                  onChange={(e) => setSelectedRecord({ ...selectedRecord, fullName: e.target.value })}
-                />
-              </div>
-              <div className="flex justify-end">
-                <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
-                  Guardar
-                </button>
-                <button type="button" onClick={handleCancel} className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-                  Cancelar
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <DynamicForm
+          data={selectedRecord}
+          onSubmit={handleFormSubmit}
+          onCancel={() => setIsModalOpen(false)}
+        />
       )}
     </div>
   );

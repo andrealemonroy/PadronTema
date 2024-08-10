@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import DynamicForm from './Form/Form';
 
 const initialWorkers = [
   {
@@ -16,51 +17,7 @@ const initialWorkers = [
     docNumberLink: '87654321',
     conceptionMonth: 'Enero'
   },
-  {
-    id: 2,
-    dniType: 'DNI',
-    dniNumber: '87654321',
-    country: 'Perú',
-    birthDate: '1992-02-02',
-    surname1: 'Rodríguez',
-    surname2: 'Sánchez',
-    name1: 'Ana',
-    gender: 'F',
-    familyLink: 'Madre',
-    docTypeLink: 'DNI',
-    docNumberLink: '12345678',
-    conceptionMonth: 'Febrero'
-  },
-  {
-    id: 3,
-    dniType: 'DNI',
-    dniNumber: '11223344',
-    country: 'Perú',
-    birthDate: '1985-03-03',
-    surname1: 'Martínez',
-    surname2: 'López',
-    name1: 'Carlos',
-    gender: 'M',
-    familyLink: 'Hijo',
-    docTypeLink: 'DNI',
-    docNumberLink: '55667788',
-    conceptionMonth: 'Marzo'
-  },
-  {
-    id: 4,
-    dniType: 'DNI',
-    dniNumber: '55667788',
-    country: 'Perú',
-    birthDate: '1988-04-04',
-    surname1: 'Fernández',
-    surname2: 'Torres',
-    name1: 'Lucía',
-    gender: 'F',
-    familyLink: 'Hija',
-    docTypeLink: 'DNI',
-    docNumberLink: '11223344',
-    conceptionMonth: 'Abril'
-  }
+  // other workers...
 ];
 
 const DatosDerechohabiente = () => {
@@ -70,7 +27,20 @@ const DatosDerechohabiente = () => {
   const [filterGender, setFilterGender] = useState('');
   const [filterFamilyLink, setFilterFamilyLink] = useState('');
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({
+    dniType: '', 
+    dniNumber: '', 
+    country: '', 
+    birthDate: '', 
+    surname1: '', 
+    surname2: '', 
+    name1: '', 
+    gender: '', 
+    familyLink: '', 
+    docTypeLink: '', 
+    docNumberLink: '', 
+    conceptionMonth: '', 
+  });
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
@@ -97,7 +67,20 @@ const DatosDerechohabiente = () => {
 
   const handleAdd = () => {
     setIsFormOpen(true);
-    setFormData({});
+    setFormData({
+      dniType: '', 
+      dniNumber: '', 
+      country: '', 
+      birthDate: '', 
+      surname1: '', 
+      surname2: '', 
+      name1: '', 
+      gender: '', 
+      familyLink: '', 
+      docTypeLink: '', 
+      docNumberLink: '', 
+      conceptionMonth: '', 
+    });
   };
 
   const handleEdit = (item) => {
@@ -202,165 +185,13 @@ const DatosDerechohabiente = () => {
         </tbody>
       </table>
       {isFormOpen && (
-        <Form
+        <DynamicForm
           data={formData}
           onSubmit={handleFormSubmit}
           onCancel={() => setIsFormOpen(false)}
         />
       )}
     </div>
-  );
-};
-
-const Form = ({ data, onSubmit, onCancel }) => {
-  const [form, setForm] = useState(data);
-
-  const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSubmit(form);
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg">
-        <h2 className="text-xl font-bold mb-4">{form.id ? 'Editar Derechohabiente' : 'Añadir Derechohabiente'}</h2>
-        <div className="mb-4">
-          <label className="block text-gray-700 mb-2">Tipo de documento</label>
-          <input
-            type="text"
-            name="dniType"
-            value={form.dniType || ''}
-            onChange={handleChange}
-            className="border border-gray-300 rounded p-2 w-full"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 mb-2">Número de documento</label>
-          <input
-            type="text"
-            name="dniNumber"
-            value={form.dniNumber || ''}
-            onChange={handleChange}
-            className="border border-gray-300 rounded p-2 w-full"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 mb-2">País</label>
-          <input
-            type="text"
-            name="country"
-            value={form.country || ''}
-            onChange={handleChange}
-            className="border border-gray-300 rounded p-2 w-full"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 mb-2">Fecha de nacimiento</label>
-          <input
-            type="date"
-            name="birthDate"
-            value={form.birthDate || ''}
-            onChange={handleChange}
-            className="border border-gray-300 rounded p-2 w-full"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 mb-2">Apellido paterno</label>
-          <input
-            type="text"
-            name="surname1"
-            value={form.surname1 || ''}
-            onChange={handleChange}
-            className="border border-gray-300 rounded p-2 w-full"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 mb-2">Apellido materno</label>
-          <input
-            type="text"
-            name="surname2"
-            value={form.surname2 || ''}
-            onChange={handleChange}
-            className="border border-gray-300 rounded p-2 w-full"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 mb-2">Nombres</label>
-          <input
-            type="text"
-            name="name1"
-            value={form.name1 || ''}
-            onChange={handleChange}
-            className="border border-gray-300 rounded p-2 w-full"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 mb-2">Sexo</label>
-          <input
-            type="text"
-            name="gender"
-            value={form.gender || ''}
-            onChange={handleChange}
-            className="border border-gray-300 rounded p-2 w-full"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 mb-2">Vínculo familiar</label>
-          <input
-            type="text"
-            name="familyLink"
-            value={form.familyLink || ''}
-            onChange={handleChange}
-            className="border border-gray-300 rounded p-2 w-full"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 mb-2">Tipo de Doc. Que acredita el vínculo</label>
-          <input
-            type="text"
-            name="docTypeLink"
-            value={form.docTypeLink || ''}
-            onChange={handleChange}
-            className="border border-gray-300 rounded p-2 w-full"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 mb-2">N.º de Doc. que acredita el vínculo</label>
-          <input
-            type="text"
-            name="docNumberLink"
-            value={form.docNumberLink || ''}
-            onChange={handleChange}
-            className="border border-gray-300 rounded p-2 w-full"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 mb-2">Mes de concepción</label>
-          <input
-            type="text"
-            name="conceptionMonth"
-            value={form.conceptionMonth || ''}
-            onChange={handleChange}
-            className="border border-gray-300 rounded p-2 w-full"
-          />
-        </div>
-        <div className="flex justify-end">
-          <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
-            Guardar
-          </button>
-          <button type="button" onClick={onCancel} className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-            Cancelar
-          </button>
-        </div>
-      </div>
-    </form>
   );
 };
 

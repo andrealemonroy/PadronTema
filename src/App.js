@@ -29,6 +29,7 @@ import SistemaPensionario from './components/tabs/SistemaPensionario';
 import DatosLaborales from './components/tabs/DatosLaborales';
 import DatosEducativos from './components/tabs/DatosEducativos';
 import TrabajoRemoto from './components/tabs/TrabajoRemoto';
+import Otros from './components/tabs/Otros';
 
 
 function App() {
@@ -44,7 +45,7 @@ function App() {
         {isAuthenticated ? (
           <>
             <Sidebar />
-            <div className="flex-grow p-4">
+            <div className="flex-grow p-4 max-w-6xl">
               <Routes>
                 <Route path="/users" element={<Users />} />
                 <Route path="/roles" element={<Roles />} />
@@ -57,6 +58,7 @@ function App() {
                 <Route path="/tabs/DatosLaborales" element={<DatosLaborales />} />
                 <Route path="/tabs/DatosEducativos" element={<DatosEducativos />} />
                 <Route path="/tabs/TrabajoRemoto" element={<TrabajoRemoto />} />
+                <Route path="/tabs/Hobbies" element={<Otros />} />
                 <Route path="/human-resources" element={<HumanResources />} />
                 <Route path="/DatosDerechohabiente" element={<DatosDerechohabiente />} />
                 <Route path="/incidents" element={<Incidents />} />

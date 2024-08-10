@@ -148,7 +148,7 @@ const DatosPersonales = () => {
         Añadir
       </button>
       <div className="overflow-x-auto">
-        <table {...getTableProps()} className="min-w-full bg-white">
+        <table {...getTableProps()} className="min-w-full bg-white" style={{ minWidth: '1200px' }}>
           <thead>
             {headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()}>
